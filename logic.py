@@ -1,4 +1,5 @@
 import pandas as pd
+import os
 from openpyxl import load_workbook
 
 class Logic():
@@ -100,10 +101,10 @@ class Logic():
             return 'no'
 
     # --- Основная функция для расчета кредитной карты ---
-    def run(self, files):
+    def run(self, event=None, files=None):
         for file in files:
             try:
-                self.output(f'\nОбязательство {file}')
+                self.output(f'\nОбязательство {os.path.basename(file)}')
                 try:
                     wb = load_workbook(file, data_only=True)
                 except:
@@ -571,7 +572,7 @@ class Logic():
                         self.temp.clear()
                     break
             except Exception as e:
-                self.output(f"Ошибка при обработке файла {file}")
+                self.output(f"Ошибка при обработке файла {os.path.basename(file)}")
                 continue
 
         rcy = sum(self.su)
@@ -585,45 +586,31 @@ class Logic():
         prsudp = sum(self.prsud)
         pneus = sum(self.neus)
         
-        # self.output(f"{'-' * 15} Разбивка {'-' * 15}")
-        # self.output(f"{'-' * 40}")
-        
         total = {}
         
         if pneus > 0:
-            total['Неустойки'] = pneus
-            # self.output(f'{pneus:.2f} - неустойки')
+            total['Неустойки'] = round(pneus, 2)
         if ppenod > 0:
-            total['Пени за кредит'] = ppenod
-            # self.output(f'{ppenod:.2f} - пени за кредит')
+            total['Пени за кредит'] = round(ppenod, 2)
         if ppenprc > 0:
-            total['Пени за проценты'] = ppenprc
-            # self.output(f'{ppenprc:.2f} - пени за проценты')
+            total['Пени за проценты'] = round(ppenprc, 2)
         if prsudp > 0:
-            total['Прочие судебные расходы'] = prsudp
-            # self.output(f'{prsudp:.2f} - прочие судебные расходы')
+            total['Прочие судебные расходы'] = round(prsudp, 2)
         if ppp > 0:
-            total['Просроченная ссудная задолженность'] = ppp
-            # self.output(f'{ppp:.2f} - просроченная ссудная задолженность')
+            total['Просроченная ссудная задолженность'] = round(ppp, 2)
         try:
             if kmp > 0:
-                total['Комиссия'] = kmp
-                # self.output(f'{kmp:.2f} - комиссия')
+                total['Комиссия'] = round(kmp, 2)
         except NameError:
             pass
         if pgp > 0:
-            total['Госпошлина'] = pgp
-            # self.output(f'{pgp:.2f} - госпошлина')
+            total['Госпошлина'] = round(pgp, 2)
         if pprc > 0:
-            total['Просроченные проценты'] = pprc
-            # self.output(f'{pprc} - просроченные проценты')
+            total['Просроченные проценты'] = round(pprc, 2)
         if pod > 0:
-            total['Просроченный основной долг'] = pod
-            # self.output(f'{pod} - просроченный основной долг')
+            total['Просроченный основной долг'] = round(pod, 2)
         if rcy > 0:
-            self.output(f"{'-' * 40}")
-            total['Общая сумма'] = rcy
-            # self.output(f'{rcy:.2f} - ОБЩАЯ СУММА')
+            total['Общая сумма'] = round(rcy, 2)
             
         while len(self.name_obyz) > 1:
             self.name_obyz.pop()
@@ -634,35 +621,30 @@ class Logic():
         #         data["Количество обязательств"].append(kol_obyz)
         #         # data["Время"].append(datetime.now())
         
-        # self.output("")
+        self.output("")
         if (rcy < 100000):
             gosposhlina = 10000 / 2
-            total['Оплата госпошлины'] = gosposhlina
-            # self.output(f'{gosposhlina:.0f} - ОПЛАТА ГОСПОШЛИНЫ')
+            total['ОПЛАТА ГОСПОШЛНИЫ'] = round(gosposhlina, 0)
         elif (rcy > 100000 and rcy < 1000000):
             gosposhlina = ((rcy - 100000) * 0.05 + 10000) / 2
-            total['Оплата госпошлины'] = gosposhlina
-            # self.output(f'{gosposhlina:.0f} - ОПЛАТА ГОСПОШЛИНЫ')
+            total['ОПЛАТА ГОСПОШЛНИЫ'] = round(gosposhlina, 0)
         elif (rcy > 1000000 and rcy < 10000000):
             gosposhlina = ((rcy - 1000000) * 0.03 + 55000) / 2
-            total['Оплата госпошлины'] = gosposhlina
-            # self.output(f'{gosposhlina:.0f} - ОПЛАТА ГОСПОШЛИНЫ')
+            total['ОПЛАТА ГОСПОШЛНИЫ'] = round(gosposhlina, 0)
         elif (rcy > 10000000 and rcy < 50000000):
             gosposhlina = ((rcy - 10000000) * 0.01 + 325000) / 2
-            total['Оплата госпошлины'] = gosposhlina
-            # self.output(f'{gosposhlina:.0f} - ОПЛАТА ГОСПОШЛИНЫ')
+            total['ОПЛАТА ГОСПОШЛНИЫ'] = round(gosposhlina, 0)
         elif (rcy > 50000000):
             gosposhlina = ((rcy - 50000000) * 0.005 + 725000) / 2
             if (gosposhlina > 10000000):
                 gosposhlina = 10000000
-            total['Оплата госпошлины'] = gosposhlina
-        #     self.output(f'{gosposhlina:.0f} - ОПЛАТА ГОСПОШЛИНЫ')
-        # self.output(f"{'-' * 40}")    
+            total['ОПЛАТА ГОСПОШЛНИЫ'] = round(gosposhlina, 0)
+               
         try:
             wb.close()
         except UnboundLocalError:
             self.output('Файлы не выбраны')
-        
+            
         return total
 
 if __name__ == "__main__":

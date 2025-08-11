@@ -22,7 +22,7 @@ from logic import Logic
 class CalculatorWindow(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("PyQt6")
+        self.setWindowTitle("РЦИ калькулятор")
         self.resize(700, 500)
         self.setAcceptDrops(True)
         self.logic = Logic(output_func=self.append_text, ask_gp_callback=self.ask_gp_callback)
@@ -73,9 +73,9 @@ class CalculatorWindow(QWidget):
 
             if unique_new_files:
                 self.files.extend(unique_new_files)
-                file_names = [os.path.basename(f) for f in unique_new_files]
-                self.append_text("\n".join(file_names))
-
+                for f in unique_new_files:
+                    self.append_text(f"Файл РЦИ: {os.path.basename(f)}")
+                
             event.acceptProposedAction()
         else:
             event.ignore()
@@ -89,8 +89,8 @@ class CalculatorWindow(QWidget):
 
             if unique_new_files:
                 self.files.extend(unique_new_files)
-                file_names = [os.path.basename(f) for f in unique_new_files]
-                self.append_text("\n".join(file_names))
+                for f in unique_new_files:
+                    self.append_text(f"Файл РЦИ: {os.path.basename(f)}")
 
     def on_reset(self):
         self.text_output.clear()
@@ -104,7 +104,7 @@ class CalculatorWindow(QWidget):
             widget = item.widget()
             if widget:
                 widget.deleteLater()
-    
+
     def recreate_totals_group(self):
         self.layout().removeWidget(self.group_totals)
         self.group_totals.deleteLater()
@@ -113,7 +113,6 @@ class CalculatorWindow(QWidget):
         self.totals_layout = QGridLayout()
         self.group_totals.setLayout(self.totals_layout)
         self.layout().addWidget(self.group_totals)
-
 
     def append_text(self, msg):
         self.text_output.append(str(msg))
@@ -128,7 +127,7 @@ class CalculatorWindow(QWidget):
         if not self.files:
             QMessageBox.warning(self, "Ошибка", "Пожалуйста, выберите файлы для расчета.")
             return
-        self.append_text("Расчет ...")
+        self.append_text("\nРасчет ...")
 
         result = self.logic.run(files=self.files)
 
